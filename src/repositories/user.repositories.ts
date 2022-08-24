@@ -1,47 +1,65 @@
 import db from "../db";
+import DatabaseError from "../models/errors/database.error";
 import User from "../models/user.model";
 
 class UserRepository{
 
     async findAllUsers(): Promise<User[]>{
-        const query = `
-            SELECT uuid, fullname, email, login
-            FROM gameapp_user
-        `
+        try{
+            const query = `
+                SELECT uuid, fullname, email, login
+                FROM gameapp_user
+            `
 
-        const { rows } = await db.query<User>(query);
+            const { rows } = await db.query<User>(query);
 
-        return rows || [];
+            return rows || [];
+        }catch(e){
+            throw new DatabaseError('DatabaseError: ', e);
+        }
     }
 
-    async findUsersByLogin(login: string): Promise<User>{
-        const query = `
-            SELECT *
-            FROM gameapp_user
-            WHERE login = $1 OR email = $1
-        `
+    async findUsersByLogin(login: string, password:string): Promise<User>{
+        try{
+            const query = `
+                SELECT uuid, fullname, email, login
+                FROM gameapp_user 
+                    WHERE uuid = 
+                        (SELECT uuid
+                        FROM gameapp_user
+                        WHERE login = $1 OR email = $1)
+                AND password = crypt($2, $3)
+            `
 
-        const values = [login]
-        const { rows } = await db.query<User>(query, values);
-        const [ user ] = rows;
+            const values = [login, password, process.env.SALT]
+            const { rows } = await db.query<User>(query, values);
+            const [ userLogin ] = rows;
 
-        return user;
+
+            return userLogin;
+        }catch(e){
+            throw new DatabaseError('DatabaseError: ', e);
+        }
     }
 
     async createUser(user: User): Promise<string>{
-        const query = `
-            INSERT INTO gameapp_user(
-                fullname, email, login, password
-            ) VALUES ( $1, $2, $3, crypt($4, $5) )
-            RETURNING uuid
-        `
+        try{
+            const query = `
+                INSERT INTO gameapp_user(
+                    fullname, email, login, password
+                ) VALUES ( $1, $2, $3, crypt($4, $5) )
+                RETURNING uuid
+            `
 
-        const values = [user.fullname, user.email, user.login, user.password, process.env.SALT];
+            const values = [user.fullname, user.email, user.login, user.password, process.env.SALT];
 
-        const { rows } = await db.query<{ uuid: string }>(query, values);
-        const [ newUser ] = rows;
+            const { rows } = await db.query<{ uuid: string }>(query, values);
+            const [ newUser ] = rows;
 
-        return newUser.uuid;
+            return newUser.uuid;
+        }catch(e){
+            throw new DatabaseError('DatabaseError: ', e);
+        }
     }
 
 }

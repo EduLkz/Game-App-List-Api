@@ -5,23 +5,37 @@ import userRepositories from "../repositories/user.repositories";
 const userRoutes = Router();
 
 userRoutes.get('/users', async (req: Request, res: Response, next: NextFunction) => {
-    const users = await userRepositories.findAllUsers();
-    res.status(StatusCodes.OK).json(users);
+    try{
+        const users = await userRepositories.findAllUsers();
+        res.status(StatusCodes.OK).json(users);
+    }catch(e){
+        next(e);
+    }
 })
 
-userRoutes.get('/users/:login', async (req: Request<{ login: string }>, res: Response, next: NextFunction) => {
-    const login = req.params.login;
-    const user = await userRepositories.findUsersByLogin(login);
+userRoutes.get('/users/:login', async (req: Request<{ login: string, password: string }>, res: Response, next: NextFunction) => {
+    try {
+        const login = req.params.login;
+        const password = req.params.password;
+        const user = await userRepositories.findUsersByLogin(login, password);
+        
+        res.status(StatusCodes.OK).json({user});
+    } catch (e) {
+        next(e);
+    }
 
-    res.status(StatusCodes.OK).json({user});
 })
 
 
 userRoutes.post('/users', async (req: Request, res: Response, next: NextFunction) => {
-    const newUser = req.body;
+    try{
+        const newUser = req.body;
 
-    const uuid = await userRepositories.createUser(newUser);
-    res.status(StatusCodes.CREATED).send(uuid);
+        const uuid = await userRepositories.createUser(newUser);
+        res.status(StatusCodes.CREATED).send(uuid);
+    }catch(e){
+        next (e);
+    }
 })
 
 
