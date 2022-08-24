@@ -62,6 +62,26 @@ class UserRepository{
         }
     }
 
+    async changePassword(uuid: string, password: string, new_password: string){
+        try {
+            const query = `
+                UPDATE gameapp_user
+                SET
+                    password = crypt($3, $4)
+                WHERE
+                    uuid = $1 AND password = crypt($2, $4)
+            `
+
+            const values = [uuid, password, new_password, process.env.SALT]
+
+            const { rows } = await db.query<{ uuid: string }>(query, values);
+            const [ newUser ] = rows;
+
+            return newUser.uuid;
+        } catch (e) {
+            throw new DatabaseError('DatabaseError: ', e);
+        }
+    }
 }
 
 export default new UserRepository();

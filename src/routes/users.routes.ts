@@ -38,6 +38,17 @@ userRoutes.post('/users', async (req: Request, res: Response, next: NextFunction
     }
 })
 
+userRoutes.post('/users/change-password', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const { uuid, password, new_password } = req.body;
+
+        const useruuid = await userRepositories.changePassword(uuid, password, new_password);
+        res.status(StatusCodes.OK).send(useruuid);
+    }catch(e){
+        next (e);
+    }
+})
+
 
 
 export default userRoutes;
