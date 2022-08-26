@@ -15,9 +15,7 @@ userRoutes.get('/users', async (req: Request, res: Response, next: NextFunction)
 
 userRoutes.post('/users/login', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const body = req.body;
-        const login = req.body.login;
-        const password = req.body.password;
+        const { login, password } = req.body;
         const user = await userRepositories.findUsersByLogin(login, password);
         
         res.status(StatusCodes.OK).json({user});

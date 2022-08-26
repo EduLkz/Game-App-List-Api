@@ -17,9 +17,31 @@ gamesRoutes.get('/games/:uuid', async (req: Request<{ uuid: string }>, res: Resp
 
 gamesRoutes.post('/games', async (req: Request, res: Response, next: NextFunction) => {
     try{
-        const new_game = req.body;
+        const { new_game } = req.body;
         const games = await gamesRepositories.AddUserGame(new_game);
         res.status(StatusCodes.CREATED).json(games);
+    }catch(e){
+        next(e)
+    }
+})
+
+
+gamesRoutes.post('/games/update', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const { game } = req.body;
+        const games = await gamesRepositories.UpdateGame(game);
+        res.status(StatusCodes.OK).json(games);
+    }catch(e){
+        next(e)
+    }
+})
+
+
+gamesRoutes.delete('/games', async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const { game } = req.body;
+        const games = await gamesRepositories.DeleteGame(game);
+        res.status(StatusCodes.OK).json(games);
     }catch(e){
         next(e)
     }
