@@ -23,4 +23,4 @@ app.use(gamesRoutes);
 
 app.use(errorHandler);
 
-app.listen(port, () => console.log(`Server at port: ${port}`));
+app.listen(port || 8000);
