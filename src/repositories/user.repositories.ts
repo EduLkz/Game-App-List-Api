@@ -19,6 +19,24 @@ class UserRepository{
         }
     }
 
+    async findUsersByID(uuid: string): Promise<User>{
+        try{
+            const query = `
+                SELECT uuid, fullname, email, login
+                FROM gameapp_user 
+                    WHERE uuid = $1
+            `
+
+            const values = [uuid]
+            const { rows } = await db.query<User>(query, values);
+            const [ userLogin ] = rows;
+
+            return userLogin;
+        }catch(e){
+            throw new DatabaseError('DatabaseError: ', e);
+        }
+    }
+
     async findUsersByLogin(login: string, password:string): Promise<User>{
         try{
             const query = `
@@ -34,7 +52,6 @@ class UserRepository{
             const values = [login, password, process.env.SALT]
             const { rows } = await db.query<User>(query, values);
             const [ userLogin ] = rows;
-
 
             return userLogin;
         }catch(e){

@@ -1,31 +1,33 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
 import ForbidenError from "../models/errors/forbidden.error";
+import JWT from 'jsonwebtoken';
+import basicAuthMiddleware from "../middlewares/basic-auth-middleware";
 
 const authRoutes = Router();
 
-authRoutes.post('/token',  (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+authRoutes.post('/token', basicAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const authorizationHeader = req.headers['authorization']
-    
-        if(!authorizationHeader){
-            throw new ForbidenError('Unauthorized');
-        }
+        const user = req.user;
 
-        const [authType, token] = authorizationHeader.split(' ');
-
-        if(authType !== 'Basic' || !token){
-            throw new ForbidenError('Unauthorized');
-        }
-
-        const tokenContent = Buffer.from(token, 'base64').toString('utf-8');
-
-        const [login, password] = tokenContent.split(':');
-
-        if(!login || !password){
-            throw new ForbidenError('Unauthorized');
+        if(!user){
+            throw new ForbidenError('Usuario invalidos');
         }
         
+
+        let secret_key = process.env.SECRET;
+
+        if(!secret_key){
+            throw new Error();
+        }
+
+        if(!user.uuid){
+            throw new ForbidenError('Usuario ou senha invalidos');
+        }
+        
+        const jwt = JWT.sign({ user: user }, secret_key, { subject: user.uuid });
+
+        res.status(StatusCodes.OK).json({ user:user, token: jwt });
     } catch (e) {
         next(e);
     }

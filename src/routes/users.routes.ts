@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
+import bearerAuthMiddleware from "../middlewares/bearer-auth-middleware";
 import userRepositories from "../repositories/user.repositories";
 
 const userRoutes = Router();
 
-userRoutes.get('/users', async (req: Request, res: Response, next: NextFunction) => {
+userRoutes.get('/users', bearerAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try{
         const users = await userRepositories.findAllUsers();
         res.status(StatusCodes.OK).json(users);
@@ -13,7 +14,7 @@ userRoutes.get('/users', async (req: Request, res: Response, next: NextFunction)
     }
 })
 
-userRoutes.post('/users/login', async (req: Request, res: Response, next: NextFunction) => {
+userRoutes.post('/users/login', bearerAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { login, password } = req.body;
         const user = await userRepositories.findUsersByLogin(login, password);
@@ -37,7 +38,7 @@ userRoutes.post('/users', async (req: Request, res: Response, next: NextFunction
     }
 })
 
-userRoutes.post('/users/change-password', async (req: Request, res: Response, next: NextFunction) => {
+userRoutes.post('/users/change-password', bearerAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try{
         const { uuid, password, new_password } = req.body;
 
