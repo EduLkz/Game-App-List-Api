@@ -10,8 +10,6 @@ import userRoutes from "./routes/users.routes";
 
 const app = express();
 
-const port = process.env.PORT;
-
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
 app.use(cors());
@@ -23,4 +21,4 @@ app.use(gamesRoutes);
 
 app.use(errorHandler);
 
-app.listen(port || 8000);
+app.listen(process.env.PORT || 8000);
