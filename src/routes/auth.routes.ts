@@ -14,7 +14,6 @@ authRoutes.post('/token', basicAuthMiddleware, async (req: Request, res: Respons
             throw new ForbidenError('Usuario invalidos');
         }
         
-
         let secret_key = process.env.SECRET;
 
         if(!secret_key){

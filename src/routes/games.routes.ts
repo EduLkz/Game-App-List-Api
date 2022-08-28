@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from "http-status-codes";
+import bearerAuthMiddleware from "../middlewares/bearer-auth-middleware";
 import gamesRepositories from "../repositories/games.repositories";
 
 const gamesRoutes = Router();
 
-gamesRoutes.get('/games/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+gamesRoutes.get('/games/:uuid', bearerAuthMiddleware, async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     try{
         const user_uuid = req.params.uuid;
         const games = await gamesRepositories.GetUserGames(user_uuid);
@@ -15,7 +16,7 @@ gamesRoutes.get('/games/:uuid', async (req: Request<{ uuid: string }>, res: Resp
 })
 
 
-gamesRoutes.post('/games', async (req: Request, res: Response, next: NextFunction) => {
+gamesRoutes.post('/games', bearerAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try{
         const { new_game } = req.body;
         const games = await gamesRepositories.AddUserGame(new_game);
@@ -26,7 +27,7 @@ gamesRoutes.post('/games', async (req: Request, res: Response, next: NextFunctio
 })
 
 
-gamesRoutes.post('/games/update', async (req: Request, res: Response, next: NextFunction) => {
+gamesRoutes.post('/games/update', bearerAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try{
         const { game } = req.body;
         const games = await gamesRepositories.UpdateGame(game);
@@ -37,7 +38,7 @@ gamesRoutes.post('/games/update', async (req: Request, res: Response, next: Next
 })
 
 
-gamesRoutes.delete('/games', async (req: Request, res: Response, next: NextFunction) => {
+gamesRoutes.delete('/games', bearerAuthMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try{
         const { game } = req.body;
         const games = await gamesRepositories.DeleteGame(game);
