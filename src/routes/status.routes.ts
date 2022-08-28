@@ -1,10 +1,9 @@
-import { Router, Request, Response } from "express";
-import StatusCodes from 'http-status-codes';
+import { Request, Response, Router } from "express";
 
 const statusRoutes = Router();
 
 statusRoutes.get('/status', (req: Request, res: Response) =>{ 
-    return res.status(StatusCodes.OK).send('Ok'); 
+    return res.status(200).send('Ok'); 
 })
 
 
